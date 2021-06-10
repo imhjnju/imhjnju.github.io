@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/safari_pinned_tab.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="IC," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Eyerisssystem architecture 工作流程： ​    Eyeriss只运行的DNN的推理(inference)阶段，不做训练。  接受配置流(图中Configuration Bits，1794 b)，配置计算模式(卷积核大小，步长；输入大小与维度；输出大小与维度) 从DRAM中读取数据，计算一层结果，(一层都计算完之后)将结果写回到DRAM 回到1，重新配置下一层结果  on">
+<meta name="keywords" content="IC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Eyeriss Notes">
+<meta property="og:url" content="http:&#x2F;&#x2F;imhjnju.github.io&#x2F;2020&#x2F;04&#x2F;24&#x2F;Eyeriss&#x2F;index.html">
+<meta property="og:site_name" content="Huangjian&#39;s Blog">
+<meta property="og:description" content="Eyerisssystem architecture 工作流程： ​    Eyeriss只运行的DNN的推理(inference)阶段，不做训练。  接受配置流(图中Configuration Bits，1794 b)，配置计算模式(卷积核大小，步长；输入大小与维度；输出大小与维度) 从DRAM中读取数据，计算一层结果，(一层都计算完之后)将结果写回到DRAM 回到1，重新配置下一层结果  on">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100246725.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100316253.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100342808.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100405768.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100429795.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100452681.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100525561.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100544979.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100610583.png">
+<meta property="og:updated_time" content="2021-06-05T02:06:30.880Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;image-20210605100246725.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://imhjnju.github.io/2020/04/24/Eyeriss/"/>
+
+
+
+
+
+  <title>Eyeriss Notes | Huangjian's Blog</title>
+  
+
+
+
+
+
+
+
+
+<link rel="alternate" href="/atom.xml" title="Huangjian's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Huangjian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Record</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/./" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://imhjnju.github.io/2020/04/24/Eyeriss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jian Huang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Huangjian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Eyeriss Notes</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-24T16:34:13+08:00">
+                2020-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index">
+                    <span itemprop="name">Tech</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  1.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Eyeriss"><a href="#Eyeriss" class="headerlink" title="Eyeriss"></a>Eyeriss</h1><h2 id="system-architecture"><a href="#system-architecture" class="headerlink" title="system architecture"></a>system architecture</h2><p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100246725.png" alt="image-20210605100246725"></p>
+<p><strong><em>工作流程：</em></strong></p>
+<p>​    Eyeriss只运行的DNN的<strong>推理(inference)</strong>阶段，不做训练。</p>
+<ol>
+<li>接受配置流(图中Configuration Bits，1794 b)，配置计算模式(卷积核大小，步长；输入大小与维度；输出大小与维度)</li>
+<li>从DRAM中读取数据，计算一层结果，(一层都计算完之后)将结果写回到DRAM</li>
+<li>回到1，重新配置下一层结果</li>
+</ol>
+<h3 id="on-chip"><a href="#on-chip" class="headerlink" title="on-chip"></a>on-chip</h3><p>两个时钟域，分开独立工作：</p>
+<ol>
+<li><p>Core Clock</p>
+<p>核心的计算单元，在这里运行计算部分，主要包含以下几个部分：</p>
+<ol>
+<li><p>数据编码解码</p>
+<p>Eyeriss-v1采用RLC编码(游程编码)，V2采用CSR编码。这种数据压缩表示能够1. 减少存储空间 2. 降低传输数据量，提升传输速度。特别是数据在ReLU之后，数据中有比较多的0，这种编码方式能极大提升效率。</p>
+</li>
+<li><p>Global Buffer(108 KB)</p>
+<p>Eyeriss片上一次能够计算一层，因此需要这些一个比较大的存储空间，当filter，ifmap等数据从DRAM中读取之后，先存储到Global Buffer(存储介质为SRAM)中，SRAM相比DRAM，数据读取能耗更小。</p>
+</li>
+<li><p>PE array(计算单元阵列)</p>
+<p>这里是12<em>14的计算阵列，一个PE中完成一个1-D的卷积运算，PE之间通过*</em>NoC** communicate，每一个PE还有一个local的存储叫<strong>spads</strong>(scratch pads)。详细信息见后。</p>
+</li>
+</ol>
+</li>
+<li><p>Link Clock</p>
+<p>这一部分主要就是控制数据的传输，时钟独立于计算单元。</p>
+</li>
+</ol>
+<h3 id="off-chip"><a href="#off-chip" class="headerlink" title="off-chip"></a>off-chip</h3><p>主要就是DRAM，从DRAM中读取数据，一层都计算完之后将结果写回到DRAM，与片上之间有一个异步的FIFO中间层。</p>
+<p>整个系统的4级存储hierarchy((由大到小)：</p>
+<p><strong>DRAM， GLB，inter-PE communication，spads</strong></p>
+<p>Eyeriss的主要两部分工作：</p>
+<ol>
+<li>通过数据复用(data reuse)来减少数据流动。</li>
+<li>压缩数据，减少存储与传输。</li>
+</ol>
+<p>对应图中结构就是，<strong>PE来实现数据复用</strong>，<strong>编解码部分来压缩数据</strong>。</p>
+<h2 id="PE-array"><a href="#PE-array" class="headerlink" title="PE array"></a>PE array</h2><h3 id="1-D-Convolution-Primitive-in-a-PE"><a href="#1-D-Convolution-Primitive-in-a-PE" class="headerlink" title="1-D Convolution Primitive in a PE"></a>1-D Convolution Primitive in a PE</h3><p>每一个PE计算1-D卷积，filter，ifmap，和psum都可以存储在PE中的spads，不需要数据流动：需要存储的大小为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">type</th>
+<th align="center">size</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">filter</td>
+<td align="center">S(卷积核一行中的元素个数)</td>
+</tr>
+<tr>
+<td align="center">ifmap</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="center">psum</td>
+<td align="center">1</td>
+</tr>
+</tbody></table>
+<p>1-D卷积如下所示：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100316253.png" alt="image-20210605100316253"></p>
+<p>这里图示只是在说明一般的1-D卷积。图示计算模式会分给3个PE来计算，也就是按照右边的划分方式分成3组。</p>
+<h3 id="Row-Stationary"><a href="#Row-Stationary" class="headerlink" title="Row-Stationary"></a>Row-Stationary</h3><p>在2-D的计算模式中：一个卷积核行数为3，ifmap行数为5的计算过程如下：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100342808.png" alt="image-20210605100342808"></p>
+<p>运算模式如下：</p>
+<table>
+<thead>
+<tr>
+<th>cycle</th>
+<th>filter</th>
+<th>ifmap</th>
+<th>compute</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>row1-&gt; PE1,1 PE1,2 PE1,3</td>
+<td>row1-&gt;PE1,1</td>
+<td>PE1,1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>row2-&gt; PE2,1 PE2,2 PE2,3</td>
+<td>row2-&gt;PE2,1 PE1,2</td>
+<td>PE2,1  PE1,2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>row3-&gt; PE3,1 PE3,2 PE3,3</td>
+<td>row3 -&gt; PE3,1 PE2,2 PE1,3</td>
+<td>PE3,1 PE,2,2 PE1,3</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>row4 -&gt; PE3,2 PE2,3</td>
+<td>PE3,2 PE2,3</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td>row5-&gt; PE3,3</td>
+<td>PE3,3</td>
+</tr>
+</tbody></table>
+<p>按照这样理解，感觉PSUM箭头的方向是反的？在cycle 0是计算PE1,1，然后结果给PE2,1？</p>
+<h3 id="PE-sets-logical-mapping"><a href="#PE-sets-logical-mapping" class="headerlink" title="PE sets(logical mapping)"></a>PE sets(logical mapping)</h3><p>在PE sets设计中，一个卷积核大小和R S，ofmap大小为E F，需要的PE sets为$R\times E$</p>
+<p>也就是PE sets的行数为卷积核大小，列数为ofmap的行数。</p>
+<h3 id="physical-mapping"><a href="#physical-mapping" class="headerlink" title="physical mapping"></a>physical mapping</h3><p>由于PE array的大小固定，不一定适配PE sets的大小，因此需要调整PE sets，进而能够放到PE array中进行计算。</p>
+<ul>
+<li><p>PE sets大小超过168(12*14的)</p>
+<p>就将分割行数，一次处理e行，e &lt; E。</p>
+</li>
+<li><p>PE sets宽度大于12的，长度大于14，但是总大小不超过168的</p>
+<p>调整合并到一个PE array中。</p>
+</li>
+</ul>
+<p>举例如下：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100405768.png" alt="image-20210605100405768"></p>
+<p>AlexNet 信息如下：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100429795.png" alt="image-20210605100429795"></p>
+<ul>
+<li>CONV1 PE sets为11*55，拆解成11*7，图中有两组，每组对应不同的filter channel，使用相同的ifmap channel。同时 Stride为4。并行处理两个channel。</li>
+<li>CONV2 PE sets为5*27，拆解成5*13和5*14，这两组使用相同的filter channel，因此不是并行处理。</li>
+<li>CONV3 PE sets为3*13，可以放到PE array中，还可以多并行处理，也就是这里对应4个filter channel。</li>
+<li>CONV4-CONV5 PE sets也为3*13，但是这里做了另外一种并行化处理。1,2(3,4)组内是同一filter内的channel并行；3,4组与1,2组之间是在对相同的ifmap使用不同的filter。</li>
+</ul>
+<p>进一步，如果需要增加并行度：可以考虑增大PE的计算能力：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100452681.png" alt="image-20210605100452681"></p>
+<ul>
+<li><p>a 相当于将ifmap中的两行存到spad中，PE计算一行之后结果放到相应的PSUM中，然后再开始计算另外一行。</p>
+</li>
+<li><p>b 文章中只讲到了time interleaving，没有过多的细节，我猜测是在PE中有更多的控制细节，控制计算filter 1中的第一个元素再来计算filter 2中的第一个元素，(ifmap)保持不动。</p>
+</li>
+<li><p>c感觉跟b类似，filter和ifmap都交替着来，最后的psum还是将两者相加起来。</p>
+<p>最后实现的大小是：</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>ifmap spad</th>
+<th>filter spad</th>
+<th>psum spad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>size</td>
+<td>12 * 16b</td>
+<td>224 * 16b</td>
+<td>24 * 16b</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h2 id="RLC-Run-length-Coding"><a href="#RLC-Run-length-Coding" class="headerlink" title="RLC (Run length Coding)"></a>RLC (Run length Coding)</h2><p>编码示意图如下：5b表示0的数目，16bit表示非零值。</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100525561.png" alt="image-20210605100525561"></p>
+<p>每3组run和level打包成一个64bit的集合，其中最后一位表示是否是编码的最后值。</p>
+<h2 id="system-modules"><a href="#system-modules" class="headerlink" title="system modules"></a>system modules</h2><h3 id="GLB"><a href="#GLB" class="headerlink" title="GLB"></a>GLB</h3><ul>
+<li>100KB存储ifmap和psum，分成25个bank,根据ifmap和psum需要动态调整。</li>
+<li>8KB存储filter，本来大部分都是存储在DRAM中，但是考虑到带宽需求，部分filter存储到GLB中，在计算其他部分的时候预先存储到GLB中。</li>
+</ul>
+<h3 id="Network-on-Chip"><a href="#Network-on-Chip" class="headerlink" title="Network on Chip"></a>Network on Chip</h3><ul>
+<li><p>Global Input Network</p>
+<p>根据ID(row, col)来进行匹配multicast</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100544979.png" alt="image-20210605100544979"></p>
+<ul>
+<li><p>Global Output Network</p>
+<p>基本是Input的反向传输</p>
+</li>
+<li><p>Local Network </p>
+<p>主要是方便psum的流动</p>
+</li>
+</ul>
+<h3 id="PE-and-Data-Gating"><a href="#PE-and-Data-Gating" class="headerlink" title="PE and Data Gating"></a>PE and Data Gating</h3><p>针对零元素，不需要计算，因此可以跳过，PE结构如下：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/image-20210605100610583.png" alt="image-20210605100610583"></p>
+<h2 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h2><ul>
+<li>工作频率200MHz</li>
+<li>16 bit 定点</li>
+<li>Alexnet 34.7 frame/s，278mW，  VGG16 0.7 frame/s</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    Jian Huang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://imhjnju.github.io/2020/04/24/Eyeriss/" title="Eyeriss Notes">http://imhjnju.github.io/2020/04/24/Eyeriss/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IC/" rel="tag"># IC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/06/10/GCN%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/" rel="prev" title="GCN hardware summary">
+                GCN hardware summary <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Jian Huang" />
+            
+              <p class="site-author-name" itemprop="name">Jian Huang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Eyeriss"><span class="nav-number">1.</span> <span class="nav-text">Eyeriss</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#system-architecture"><span class="nav-number">1.1.</span> <span class="nav-text">system architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#on-chip"><span class="nav-number">1.1.1.</span> <span class="nav-text">on-chip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#off-chip"><span class="nav-number">1.1.2.</span> <span class="nav-text">off-chip</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PE-array"><span class="nav-number">1.2.</span> <span class="nav-text">PE array</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-D-Convolution-Primitive-in-a-PE"><span class="nav-number">1.2.1.</span> <span class="nav-text">1-D Convolution Primitive in a PE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Row-Stationary"><span class="nav-number">1.2.2.</span> <span class="nav-text">Row-Stationary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PE-sets-logical-mapping"><span class="nav-number">1.2.3.</span> <span class="nav-text">PE sets(logical mapping)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#physical-mapping"><span class="nav-number">1.2.4.</span> <span class="nav-text">physical mapping</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RLC-Run-length-Coding"><span class="nav-number">1.3.</span> <span class="nav-text">RLC (Run length Coding)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-modules"><span class="nav-number">1.4.</span> <span class="nav-text">system modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GLB"><span class="nav-number">1.4.1.</span> <span class="nav-text">GLB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Network-on-Chip"><span class="nav-number">1.4.2.</span> <span class="nav-text">Network on Chip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PE-and-Data-Gating"><span class="nav-number">1.4.3.</span> <span class="nav-text">PE and Data Gating</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Results"><span class="nav-number">1.5.</span> <span class="nav-text">Results</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jian Huang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">3.3k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

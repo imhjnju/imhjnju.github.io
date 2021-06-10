@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/safari_pinned_tab.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="IC," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="GCN文章总结有没有可能出现新的数据压缩方式适配GCN的处理模式 [TOC] UWB-GCN: Hardware Acceleration of Graph-Convolution-Network through Runtime Workload Rebalancing最早的一篇文章，提出了GCN推理加速的一个最早的设计。主要关注点在数据稀疏以及load balance。 首先是baseline">
+<meta name="keywords" content="IC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCN hardware summary">
+<meta property="og:url" content="http:&#x2F;&#x2F;imhjnju.github.io&#x2F;2021&#x2F;06&#x2F;10&#x2F;GCN%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93&#x2F;index.html">
+<meta property="og:site_name" content="Huangjian&#39;s Blog">
+<meta property="og:description" content="GCN文章总结有没有可能出现新的数据压缩方式适配GCN的处理模式 [TOC] UWB-GCN: Hardware Acceleration of Graph-Convolution-Network through Runtime Workload Rebalancing最早的一篇文章，提出了GCN推理加速的一个最早的设计。主要关注点在数据稀疏以及load balance。 首先是baseline">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;73Z0zKGCsY6aOjs93Y-3yMjGQXs1VjxE_QduuGGocGI.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;KkpKMxOgRSUxBqCDWiCPbZvKNQHS017mS62tcmuC-uQ.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;imhjnju&#x2F;imagebed&#x2F;raw&#x2F;master&#x2F;o-VEq8_dTnu3-HJQEFWklc98NqqWzvUQ3nqytM4sTUs.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;AzyPnUi5h-orohH1G2tqpo0tVKCCdadrwx17C0PsX9s.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;wsvoKxoP7T46M0-glR-H550-c6xyGmi2yyWO9f2oN9M.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;neW0p19BeM0abDANS04aSUTarY_oSOv8KWhwiR0A1H4.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;BLfBbCkkBCG0hgeeODnLzIDOfAR_e_tOfq8CJjbV7Os.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;7OTNaWWBh-u9FvdDfuaK-Cmd78_Ey06JOlGJ_BpudzE.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;fX-iKsW8P8TkRozaMmWbW9u3ZICQd8uvv5nPL3xOefM.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;CGf96hohnoGeIaNdSRiunzbtj0Xofshs4KUM1f4kBKk.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;e2KfewzDTZhEC_90zdvkD0_HIxGkTbrmd8Z6CTSAw44.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;BK-OX_b8t1Fp2_g9HP3EUXL_NIEdP8tryTFvUT5d2QM.original.fullsize.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;xG34ghELqfTV3cf_pQ8e4aEI8at_YVIQgaU4STE5nu0.original.fullsize.png">
+<meta property="og:updated_time" content="2021-06-10T04:46:06.475Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;cdn.mathpix.com&#x2F;snip&#x2F;images&#x2F;73Z0zKGCsY6aOjs93Y-3yMjGQXs1VjxE_QduuGGocGI.original.fullsize.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://imhjnju.github.io/2021/06/10/GCN文章总结/"/>
+
+
+
+
+
+  <title>GCN hardware summary | Huangjian's Blog</title>
+  
+
+
+
+
+
+
+
+
+<link rel="alternate" href="/atom.xml" title="Huangjian's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Huangjian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Record</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/./" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://imhjnju.github.io/2021/06/10/GCN%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jian Huang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Huangjian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">GCN hardware summary</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-06-10T12:37:57+08:00">
+                2021-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index">
+                    <span itemprop="name">Tech</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  1.9k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="GCN文章总结"><a href="#GCN文章总结" class="headerlink" title="GCN文章总结"></a>GCN文章总结</h1><p>有没有可能出现新的数据压缩方式适配GCN的处理模式</p>
+<p>[TOC]</p>
+<h2 id="UWB-GCN-Hardware-Acceleration-of-Graph-Convolution-Network-through-Runtime-Workload-Rebalancing"><a href="#UWB-GCN-Hardware-Acceleration-of-Graph-Convolution-Network-through-Runtime-Workload-Rebalancing" class="headerlink" title="UWB-GCN: Hardware Acceleration of Graph-Convolution-Network through Runtime Workload Rebalancing"></a>UWB-GCN: Hardware Acceleration of Graph-Convolution-Network through Runtime Workload Rebalancing</h2><p>最早的一篇文章，提出了GCN推理加速的一个最早的设计。主要关注点在数据稀疏以及load balance。</p>
+<p>首先是baseline 设计：这个设计也是最早的GCN加速器，然后在baseline的基础上进行workload rebalancing.成为最终设计。</p>
+<p>首先在计算模式上，先计算AXW的时候分为两种方式，(AX)W或者A(XW),由于不同的稀疏度，A十分稀疏，X一般稀疏，W比较密集，这里选用A(XW)的计算模式，这样两步计算中都会是SPMM(Sparse Dense Matrix Multiplication), 计算workload会比较小。</p>
+<p>SPMM具体的计算方式：由$A\times B = C$变换得到：</p>
+<p>$C=\left[\sum_{j=0}^{n-1} A_{j} b_{(j, 0)}, \sum_{j=0}^{n-1} A_{j} b_{(j, 1)}, \ldots, \sum_{j=0}^{n-1} A_{j} b_{(j, k-1)}\right]$</p>
+<p>具象表示：()</p>
+<p><img src="https://cdn.mathpix.com/snip/images/73Z0zKGCsY6aOjs93Y-3yMjGQXs1VjxE_QduuGGocGI.original.fullsize.png" alt=""></p>
+<p>workload的分配，在假设数据按照行均匀分布的前提下，每两行的数据(3个非0数据)分配到一个PE。</p>
+<p>并行化处理的一个划分:</p>
+<p><img src="https://cdn.mathpix.com/snip/images/KkpKMxOgRSUxBqCDWiCPbZvKNQHS017mS62tcmuC-uQ.original.fullsize.png" alt=""></p>
+<p>同时他这个一次处理一列带来的效果是：</p>
+<ol>
+<li>很好地提高并行度，可以流水线操作，一次一列交替执行。</li>
+<li>减少片上存储，不需要同时存储整个图，而只需要其中的一列。</li>
+</ol>
+<p>主要的架构设计如下：</p>
+<p><img src="https://gitee.com/imhjnju/imagebed/raw/master/o-VEq8_dTnu3-HJQEFWklc98NqqWzvUQ3nqytM4sTUs.original.fullsize.png" alt=""></p>
+<p>主要包含以下几个部分：</p>
+<ul>
+<li><p>sparse-matrix-memory (SP-MMeM)</p>
+<p> SPMMeM buffers the input sparse matrix A</p>
+</li>
+<li><p>dense-column-memory (DCM)</p>
+<p>DCM buffers the input dense matrix B .</p>
+</li>
+<li><p>task-distributor &amp; Queue (TDQ)</p>
+</li>
+<li><p>PE-array</p>
+</li>
+<li><p>accumulation-buffers-array (ACC).<br>ACC buffers the partial results of the resulting matrix C for accumulation.</p>
+</li>
+</ul>
+<p>其中根据稀疏程度TDQ分为两类，在通常稀疏的时候(50%左右)，为TDQ1，上图左边。在十分稀疏的时候（90%以上）为TDQ2。</p>
+<p>TDQ2采用多级Omega路由网络，同时考虑到MAC可能需要多个周期进行计算，可能会产生RaW冒险，因此两者都配备RaW检查其和Stall Buffer，其处理思路类似于处理器中的scoreboard。</p>
+<p>主要的处理顺序是：</p>
+<ol>
+<li>首先计算$X\times W$的时候，是一个一般稀疏矩阵跟密集矩阵相乘，使用TDQ1。</li>
+<li>$X\times W$计算的结果中，每计算好一列就可以送到下一个计算序列中，也就是$A\times (X \times W)$这个时候A是极度稀疏矩阵，采用TDQ2进行分发。</li>
+</ol>
+<p>由于以上处理方式是建立在load balance的基础上，现在作者主要解决的问题是load imbalance。其中有两种主要的imbalance方式,如下图所示：</p>
+<p><img src="https://cdn.mathpix.com/snip/images/AzyPnUi5h-orohH1G2tqpo0tVKCCdadrwx17C0PsX9s.original.fullsize.png" alt=""></p>
+<ul>
+<li>Local imbalance 主要是相邻的两行之间会有跳跃，也就是波动。</li>
+<li>Remote imbalance 或者可以说波动的特别大，集中在某些特殊行</li>
+</ul>
+<p>两者的稀疏统计直方图可以显示如下：</p>
+<p><img src="https://cdn.mathpix.com/snip/images/wsvoKxoP7T46M0-glR-H550-c6xyGmi2yyWO9f2oN9M.original.fullsize.png" alt=""></p>
+<p>为此作者进一步改善，提出两种方式解决这个不平衡问题：</p>
+<ol>
+<li><p>Dynamic Local Sharing</p>
+<p>因为这个解决的思路就是将一个比较多的区域平均分到邻域，这也是无法处理Remote Imbalance的原因，</p>
+</li>
+<li><p>Dynamic Remote Switching</p>
+<p>Remote Imbalance的这个因素需要提前调整一下，加上一个switch操作也就是将特别密集的图调整到其他空白的区域，由此形成local imbalance，进而可以使用上一种方式进一步调整。</p>
+</li>
+</ol>
+<p>过程如下：</p>
+<img src="https://cdn.mathpix.com/snip/images/neW0p19BeM0abDANS04aSUTarY_oSOv8KWhwiR0A1H4.original.fullsize.png" style="zoom:50%;" />
+
+
+
+
+
+<h2 id="HyGCN-A-GCN-Accelerator-with-Hybrid-Architecture"><a href="#HyGCN-A-GCN-Accelerator-with-Hybrid-Architecture" class="headerlink" title="HyGCN: A GCN Accelerator with Hybrid Architecture"></a>HyGCN: A GCN Accelerator with Hybrid Architecture</h2><p>主要点是在GCN的推理阶段，分成两个阶段专门进行优化，一个是Aggregation，另一个是Combine，这两个阶段可以以流水线方式执行。</p>
+<p>首先是在Aggregation，一个节点的邻节点(相隔k个元素，k一般为1,2.)会将他自己的feature聚集给这个节点，这一部分的数据往往是依赖于图的结构，非常irregular和dynamic。而在Combine阶段，则主要执行MLP(Multi-Layer Multiplication )操作,也就是CNN中的全连接操作。主要进行矩阵向量相乘。这部分数据模式是static和regular的，与Aggregation完全相反。</p>
+<p>从并行度角度出发：</p>
+<ol>
+<li>feature vector 长度更长且多变，可以实现更好的intra-vertex parallalism.</li>
+<li>GCN中参数可以共享，进而可以在Combination阶段实现inter-vertex parallelism.</li>
+</ol>
+<p>整体架构：</p>
+<p><img src="https://cdn.mathpix.com/snip/images/BLfBbCkkBCG0hgeeODnLzIDOfAR_e_tOfq8CJjbV7Os.original.fullsize.png" alt=""></p>
+<p>分为四大块：</p>
+<ul>
+<li>Aggregation Engine</li>
+<li>Combination Engine</li>
+<li>Coordinator</li>
+<li>Memory Access Handler</li>
+</ul>
+<h3 id="Aggregation-Engine"><a href="#Aggregation-Engine" class="headerlink" title="Aggregation Engine"></a>Aggregation Engine</h3><ul>
+<li><p>interval shade graph partitioning</p>
+<p>通过数据复用来减少数据的不规律性。</p>
+</li>
+<li><p>window sliding-shrinking methods</p>
+<p>利用稀疏特性来减少数据访存。</p>
+</li>
+</ul>
+<p>这一部分主要是因为Aggregation阶段数据极度不规律已经动态变化，在DRAM中的读取比较杂乱，数据读取耗能大。</p>
+<ul>
+<li><p>使用了gather-based methods</p>
+<p>相比scatter-based  methods，这一方法主要是在同步耗能更少。然后结合Edge-Centric PM来增加并行度处理。</p>
+</li>
+<li><p>vertex-disperse processing mode</p>
+<p>相比vertex-concentrated，一个顶点的工作负载都分配给单独的SIMD core。这样的方式延迟大同时负载不均衡，效率低以及浪费了并行度。因此选用vertex  disperse。<img src="https://cdn.mathpix.com/snip/images/7OTNaWWBh-u9FvdDfuaK-Cmd78_Ey06JOlGJ_BpudzE.original.fullsize.png" alt=""></p>
+</li>
+<li><p>图划分和稀疏减少</p>
+<p><img src="https://cdn.mathpix.com/snip/images/fX-iKsW8P8TkRozaMmWbW9u3ZICQd8uvv5nPL3xOefM.original.fullsize.png" alt=""></p>
+</li>
+</ul>
+<p>这一部分主要是包括图a的划分，然后进行滑窗操作（顶行对应有数据的地方）然后进行window shrinking(底行回缩到有数据的地方)</p>
+<h3 id="Combine-Engine"><a href="#Combine-Engine" class="headerlink" title="Combine Engine"></a>Combine Engine</h3><ul>
+<li>Multi granular systolic array  </li>
+<li>复用参数</li>
+</ul>
+<p>这一部分数据比较规律，主要问题是不同线程之间数据复用和同步耗时长。</p>
+<ul>
+<li>然后使用MVM-Centric PM 来并行处理MVM计算。</li>
+</ul>
+<p>提出了两种模式： </p>
+<p><img src="https://cdn.mathpix.com/snip/images/CGf96hohnoGeIaNdSRiunzbtj0Xofshs4KUM1f4kBKk.original.fullsize.png" alt=""></p>
+<ul>
+<li><p>Independent Working Mode</p>
+<p>图a这种方式对应了低延时，</p>
+</li>
+<li><p>Cooperative Working Mode</p>
+<p>图b这种方式对应了低能耗</p>
+</li>
+</ul>
+<h3 id="Coordinator"><a href="#Coordinator" class="headerlink" title="Coordinator"></a>Coordinator</h3><p>这一设计主要在优化从DRAM中的读取，最开始是混乱的读取，数据地址不规律，不利用cache等发挥作用。</p>
+<p><img src="https://cdn.mathpix.com/snip/images/e2KfewzDTZhEC_90zdvkD0_HIxGkTbrmd8Z6CTSAw44.original.fullsize.png" alt=""></p>
+<p>​    将顺序更改为：</p>
+<p> edges &gt; input features &gt; weights &gt; output features</p>
+<p>不过这个不跨越batch，也就是后面的batch里高优先级数据不比当前batch里低优先级的数据提前。</p>
+<h2 id="GraphACT-Accelerating-GCN-Training-on-CPU-FPGA-Heterogeneous-Platforms"><a href="#GraphACT-Accelerating-GCN-Training-on-CPU-FPGA-Heterogeneous-Platforms" class="headerlink" title="GraphACT: Accelerating GCN Training on CPU-FPGA Heterogeneous Platforms"></a>GraphACT: Accelerating GCN Training on CPU-FPGA Heterogeneous Platforms</h2><p>这文章的专注点不同于上两篇文章，这个是在进行训练加速，以上两者是在推理阶段的加速。</p>
+<p>核心思想是：</p>
+<ol>
+<li><p>算法</p>
+<p>算法选择上是在选择合适的算法，其能够得到合适的minibatch, 资源上能够适配BRAM，作者总结了三类算法：</p>
+<ul>
+<li><p>Minibatch by sampling GCN layers</p>
+<p>最后一层抽取b个nodes，前一层抽取a·b个nodes，第一层抽取 $a^L \times b$个nodes</p>
+</li>
+<li><p>Minibatch by sampling training graph</p>
+<p>直接从图中抽样，抽样的图更小</p>
+</li>
+<li><p>Remark on notation</p>
+</li>
+</ul>
+<p>最后通过比较computation to communication ratio得到一个合适的训练算法：</p>
+<p>H. Zeng, H. Zhou, A. Srivastava, R. Kannan, and V. Prasanna. 2019. Accurate, Efficient and Scalable Graph Embedding. In 2019 IEEE International Parallel and Distributed Processing Symposium (IPDPS). 462–471. <a href="https://doi.org/10.1109/IPDPS.2019.00056" target="_blank" rel="noopener">https://doi.org/10.1109/IPDPS.2019.00056</a></p>
+</li>
+<li><p>消除冗余(有点类似VLSI课程里算法强度缩减)</p>
+<p>消除冗余核心思想是提前计算后面复用较高的单元，根据图的特性有一些具体的算法，这里没有细看。</p>
+</li>
+<li><p>并行化加速</p>
+</li>
+</ol>
+<p>架构设计：</p>
+<p><img src="https://cdn.mathpix.com/snip/images/BK-OX_b8t1Fp2_g9HP3EUXL_NIEdP8tryTFvUT5d2QM.original.fullsize.png" alt=""></p>
+<ul>
+<li>CPU performs graph sampling, and then converts Gs to Gs，softmax loss ; FPGA performs the forward and backward pass.</li>
+<li>通过合适的参数配置，一些图数据在读取到BRAM之后就能够供FPGA一直使用从第一层计算到最后一层。</li>
+<li>分为两大块，Feature Aggregation Module &amp; Weight Transformation Module</li>
+</ul>
+<p>CPU和FPGA之间的调度：</p>
+<img src="https://cdn.mathpix.com/snip/images/xG34ghELqfTV3cf_pQ8e4aEI8at_YVIQgaU4STE5nu0.original.fullsize.png" style="zoom:50%;" />
+
+
+
+
+
+
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    Jian Huang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://imhjnju.github.io/2021/06/10/GCN%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/" title="GCN hardware summary">http://imhjnju.github.io/2021/06/10/GCN%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IC/" rel="tag"># IC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/24/Eyeriss/" rel="next" title="Eyeriss Notes">
+                <i class="fa fa-chevron-left"></i> Eyeriss Notes
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Jian Huang" />
+            
+              <p class="site-author-name" itemprop="name">Jian Huang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GCN文章总结"><span class="nav-number">1.</span> <span class="nav-text">GCN文章总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UWB-GCN-Hardware-Acceleration-of-Graph-Convolution-Network-through-Runtime-Workload-Rebalancing"><span class="nav-number">1.1.</span> <span class="nav-text">UWB-GCN: Hardware Acceleration of Graph-Convolution-Network through Runtime Workload Rebalancing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HyGCN-A-GCN-Accelerator-with-Hybrid-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">HyGCN: A GCN Accelerator with Hybrid Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Aggregation-Engine"><span class="nav-number">1.2.1.</span> <span class="nav-text">Aggregation Engine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Combine-Engine"><span class="nav-number">1.2.2.</span> <span class="nav-text">Combine Engine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Coordinator"><span class="nav-number">1.2.3.</span> <span class="nav-text">Coordinator</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GraphACT-Accelerating-GCN-Training-on-CPU-FPGA-Heterogeneous-Platforms"><span class="nav-number">1.3.</span> <span class="nav-text">GraphACT: Accelerating GCN Training on CPU-FPGA Heterogeneous Platforms</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jian Huang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">3.3k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
